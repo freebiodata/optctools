@@ -1,0 +1,9 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { ShieldCheck } from '@lucide/astro';
+---
+
+<BaseLayout title="Privacy | OPTCGTools" description="OPTCGTools privacy statement: calculator inputs stay in the browser and are not stored by the site.">
+  <section class="page-intro"><div class="shell"><nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><span>Privacy</span></nav><h1>Privacy, plainly.</h1><p>Calculator inputs belong to your game state - not to this site.</p></div></section>
+  <section class="content-section"><div class="shell"><span class="eyebrow" style="color: var(--red)"><ShieldCheck size={15} /> Last updated October 12, 2026</span><h2>What OPTCGTools does and does not collect</h2><p>The calculators on OPTCGTools run in your browser. Board state, counter estimates, deck counts, and form entries are not sent to an OPTCGTools application server, stored in an OPTCGTools database, or attached to an account. The site has no sign-in and no advertising or analytics scripts in this release.</p><h3>Normal web hosting</h3><p>Like any website, the hosting provider may process standard technical request data needed to deliver pages, such as IP address, requested URL, browser type, and time of request. This is governed by the host's own service terms and controls. OPTCGTools does not use calculator inputs to build player profiles.</p><h3>External links</h3><p>The Rules & Method page links to the official ONE PIECE Card Game rules. When you follow an external link, that site has its own privacy practices.</p><h3>Changes</h3><p>If this site later adds a contact form, analytics, cookies, saved states, or an account system, this page must be updated before those features go live. Until then, the meaningful privacy choice is simple: calculations remain local.</p></div></section>
+</BaseLayout>

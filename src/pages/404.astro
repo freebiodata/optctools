@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Anchor, Compass } from '@lucide/astro';
+---
+
+<BaseLayout title="Lost at Sea | OPTCGTools" description="This OPTCGTools page could not be found.">
+  <section class="hero" style="min-height: 68vh; display: grid; place-items: center; text-align: center;">
+    <div class="shell">
+      <span class="eyebrow"><Anchor size={15} /> 404 · uncharted waters</span>
+      <h1>This route <em>isn't on the map.</em></h1>
+      <p class="hero-lede" style="margin-inline: auto;">The calculation you wanted may have moved, or this link never existed. Pick a tool and get back to the useful math.</p>
+      <div class="hero-actions" style="justify-content: center;"><a class="button gold" href="/"><Compass size={16} /> Back to OPTCGTools</a><a class="button ghost" href="/lethal-calculator/">Open Lethal Calculator</a></div>
+    </div>
+  </section>
+</BaseLayout>

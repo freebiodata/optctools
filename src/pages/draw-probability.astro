@@ -1,0 +1,98 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { BookOpenCheck, Dices, Info, RotateCcw, Sparkles } from '@lucide/astro';
+
+const schemas = [
+  {
+    '@context': 'https://schema.org', '@type': 'WebApplication', name: 'OPTCG Draw Probability Calculator',
+    url: 'https://optctools.top/draw-probability/', applicationCategory: 'GameApplication', operatingSystem: 'Any',
+    description: 'A hypergeometric draw probability calculator for ONE PIECE Card Game deck math and mulligan odds.',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  },
+  { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://optctools.top/' },
+    { '@type': 'ListItem', position: 2, name: 'Draw Probability Calculator', item: 'https://optctools.top/draw-probability/' },
+  ] },
+];
+---
+
+<BaseLayout title="ONE PIECE TCG Draw Probability Calculator | OPTCGTools" description="Calculate ONE PIECE Card Game draw odds with hypergeometric math, extra looks, and opening redraw success odds." schemas={schemas}>
+  <section class="page-intro">
+    <div class="shell">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><span>Draw Probability</span></nav>
+      <h1>ONE PIECE TCG <span style="color: var(--gold)">Draw Odds</span></h1>
+      <p>Know the odds of seeing your 4-of before you commit to a keep. This calculator uses transparent hypergeometric math - no sampled hands, no black box.</p>
+    </div>
+  </section>
+
+  <div class="shell tool-layout">
+    <section class="calculator-panel" aria-labelledby="draw-tool-title">
+      <p class="tool-kicker"><Dices size={15} /> deck → looks → probability</p>
+      <h2 id="draw-tool-title">Calculate your hit rate</h2>
+      <p class="tool-description">Use “extra looks” only for cards examined from your deck that can actually find the piece under your stated assumption.</p>
+      <form id="draw-form">
+        <div class="form-grid three">
+          <div class="field"><label for="deck-size">Deck size</label><div class="input-unit"><input id="deck-size" type="number" min="1" max="200" value="50" /><span>cards</span></div><small>Official constructed decks are 50 cards.</small></div>
+          <div class="field"><label for="target-copies">Cards you need</label><div class="input-unit"><input id="target-copies" type="number" min="0" max="50" value="4" /><span>copies</span></div><small>Count all cards that satisfy the need.</small></div>
+          <div class="field"><label for="hits-needed">Copies required</label><div class="input-unit"><input id="hits-needed" type="number" min="1" max="12" value="1" /><span>hits</span></div><small>Set 2 for a two-piece requirement.</small></div>
+        </div>
+        <div class="divider-label">Looks by your turn</div>
+        <div class="form-grid three">
+          <div class="field"><label for="turn-number">By your turn</label><select id="turn-number">{Array.from({ length: 10 }, (_, i) => <option value={i + 1} selected={i === 2}>Turn {i + 1}</option>)}</select><small>Counts a five-card opening hand.</small></div>
+          <div class="field"><label for="going">You are going</label><select id="going"><option value="first">First (no draw on T1)</option><option value="second">Second (draw on T1)</option></select><small>Uses the basic draw-phase exception.</small></div>
+          <div class="field"><label for="extra-looks">Extra valid looks</label><div class="input-unit"><input id="extra-looks" type="number" min="0" max="50" value="0" /><span>cards</span></div><small>Searches/filtering treated as extra random looks.</small></div>
+        </div>
+        <div class="form-actions"><button class="button" type="submit"><Dices size={16} /> Calculate draw odds</button><button id="draw-reset" class="button secondary" type="reset"><RotateCcw size={15} /> Reset</button></div>
+      </form>
+      <div id="draw-result" class="result" aria-live="polite"></div>
+      <p class="callout"><Info size={17} /> Searchers are not all the same. This uses a simplified “extra valid looks” model. A search that selects a trait, bottoms cards, thins the deck, or fails to find your target has card-specific odds this generic tool cannot infer.</p>
+    </section>
+    <aside class="tool-sidebar">
+      <section class="side-card"><h2>Formula</h2><p>Exact hit counts use the hypergeometric distribution, which samples without replacement. It is the standard model for cards drawn from a shuffled deck.</p></section>
+      <section class="side-card"><h2>Official starting frame</h2><p>Each player has a 50-card deck, draws five cards, and may return the full hand, shuffle, and redraw once. The first player does not draw on their first turn.</p></section>
+      <section class="side-card"><h2>Useful next stop</h2><a href="/counter-battle/">Turn a hit into battle math →</a><br /><a href="/rules-and-method/#draw">Method & limits →</a></section>
+    </aside>
+  </div>
+
+  <section class="content-section tint">
+    <div class="shell">
+      <span class="eyebrow" style="color: var(--red)"><BookOpenCheck size={15} /> Exact deck math</span>
+      <h2>How the draw probability calculator works</h2>
+      <p>Hypergeometric probability measures the chance of drawing a number of target cards from a finite deck without replacement. For exactly <em>k</em> hits when a deck has <em>N</em> cards, <em>K</em> targets, and <em>n</em> looks:</p>
+      <p class="formula">P(X = k) = C(K, k) × C(N − K, n − k) / C(N, n)</p>
+      <p>For “at least one,” the calculator sums each valid result from one hit upward. The opening redraw result treats the full redraw as a fresh five-card hand after a shuffle: chance to miss both attempts is the miss chance squared.</p>
+      <h3>A checked reference case</h3>
+      <p>A 4-of in a 50-card deck seen in five cards has a <strong>35.3%</strong> chance of appearing at least once. The result is 1 − C(46, 5) / C(50, 5). This number is a useful sanity check for any deck calculator; it is not a guaranteed keep decision.</p>
+      <h3>About “by turn N”</h3>
+      <p>The tool starts at five opening cards. It adds one natural draw for each of your turns, except that the player who goes first skips their first Draw Phase. Extra looks are capped at the deck size and treated as additional random cards seen - not as an exact emulation of a named searcher.</p>
+      <div class="faq-list">
+        <details><summary>What are the odds of drawing my 4-of?</summary><p>Set deck size to 50, copies to 4, copies required to 1, then choose the turn and any extra valid looks. In a five-card opening hand the result is 35.3%; your actual by-turn result changes with turn order and cards seen.</p></details>
+        <details><summary>Should I include cards in Life as “draws”?</summary><p>No. Life cards are not cards you have drawn to hand. The calculator begins with the opening hand and then counts cards you see via draws or a stated search effect.</p></details>
+        <details><summary>Does the mulligan result account for hand selection?</summary><p>It models the specific case where you full-redraw a hand that missed your stated target. It does not rate partial mulligans or the value of the non-target cards you keep.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import { formatPercent, mulliganHitProbability, probabilityAtLeast } from '../lib/calculators.js';
+    const form = document.querySelector('#draw-form');
+    const result = document.querySelector('#draw-result');
+    const value = (id) => Number(document.querySelector(id).value) || 0;
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const deck = Math.max(1, value('#deck-size'));
+      const copies = Math.min(deck, Math.max(0, value('#target-copies')));
+      const required = Math.max(1, value('#hits-needed'));
+      const turn = Math.max(1, value('#turn-number'));
+      const naturalDraws = document.querySelector('#going').value === 'first' ? Math.max(0, turn - 1) : turn;
+      const extraLooks = Math.max(0, value('#extra-looks'));
+      const looks = Math.min(deck, 5 + naturalDraws + extraLooks);
+      const chance = probabilityAtLeast(deck, copies, looks, required);
+      const openingChance = probabilityAtLeast(deck, copies, Math.min(deck, 5), required);
+      const mulligan = required === 1 ? mulliganHitProbability(deck, copies, Math.min(deck, 5)) : 1 - Math.pow(1 - openingChance, 2);
+      result.className = 'result active';
+      result.innerHTML = `<h3>Odds by your turn ${turn}</h3><p>With ${looks} random looks, the chance of seeing at least ${required} of your ${copies} target card${copies === 1 ? '' : 's'} is:</p><div class="big-number">${formatPercent(chance)}</div><div class="result-grid"><span class="result-stat"><strong>${looks}</strong><span>cards seen</span></span><span class="result-stat"><strong>${formatPercent(1 - chance)}</strong><span>chance to miss</span></span><span class="result-stat"><strong>${formatPercent(mulligan)}</strong><span>full-redraw opening odds</span></span></div><p style="margin-top:14px">Opening five alone: ${formatPercent(openingChance)}. Extra looks were modeled as random valid looks, not card-specific search resolution.</p>`;
+    });
+    form.addEventListener('reset', () => window.setTimeout(() => { result.className = 'result'; result.innerHTML = ''; }, 0));
+  </script>
+</BaseLayout>

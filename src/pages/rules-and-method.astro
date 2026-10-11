@@ -1,0 +1,86 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { BookOpenCheck, ExternalLink, FlaskConical, ShieldCheck } from '@lucide/astro';
+
+const schemas = [{
+  '@context': 'https://schema.org', '@type': 'Article', headline: 'OPTCGTools rules snapshot and calculator methodology',
+  description: 'Rules version, sources, formulas, assumptions, and test fixtures used by OPTCGTools.',
+  mainEntityOfPage: 'https://optctools.top/rules-and-method/', dateModified: '2026-10-12',
+  author: { '@type': 'Organization', name: 'OPTCGTools' }, publisher: { '@type': 'Organization', name: 'OPTCGTools' },
+}];
+---
+
+<BaseLayout title="Rules & Calculator Method | OPTCGTools" description="Read OPTCGTools' official rules snapshot, calculator formulas, assumptions, and limitations before using a result." schemas={schemas}>
+  <section class="page-intro">
+    <div class="shell">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><span>Rules & method</span></nav>
+      <h1>Rules snapshot & <span style="color: var(--gold)">method</span></h1>
+      <p>Every calculator on this site is deliberately narrower than the game. Here is the version, source, math, and limitation behind each answer.</p>
+    </div>
+  </section>
+
+  <section class="content-section">
+    <div class="shell">
+      <span class="eyebrow" style="color: var(--red)"><BookOpenCheck size={15} /> Versioned, cited, limited</span>
+      <h2>Rules snapshot: v1.2.1</h2>
+      <p><strong>Snapshot date:</strong> October 12, 2026. <strong>Primary source:</strong> the official English <a href="https://en.onepiece-cardgame.com/pdf/rule_comprehensive.pdf?20240426=" target="_blank" rel="noreferrer">ONE PIECE CARD GAME Comprehensive Rules, Version 1.2.1 (last updated August 28, 2026) <ExternalLink size={14} /></a>. Card text takes precedence over the comprehensive rules; use the current official document and tournament policy for an actual ruling.</p>
+      <table class="rules-table">
+        <thead><tr><th>Calculator input / model</th><th>Rules basis</th><th>What OPTCGTools does with it</th></tr></thead>
+        <tbody>
+          <tr><td>50-card deck and 10-card DON!! deck</td><td>Comprehensive Rules 5-1-2 requires exactly one Leader, a 50-card deck, and a 10-card DON!! deck.</td><td>Draw calculator starts at 50 by default; lethal tool caps entered attachable DON!! at a practical 10.</td></tr>
+          <tr><td>Opening five and one redraw</td><td>5-2-1-6 draws five, then allows each player to return their full hand, shuffle, and redraw once.</td><td>Mulligan result models two fresh five-card attempts after a full miss.</td></tr>
+          <tr><td>Turn draws</td><td>6-3-1 draws one in the Draw Phase, except the player going first does not draw on their first turn.</td><td>“By turn N” adds a five-card opener plus natural draws for the selected seat.</td></tr>
+          <tr><td>Giving DON!!</td><td>6-5-5-1 through 6-5-5-3: an active DON!! can be given to a Leader or Character; each gives +1000 power during your turn.</td><td>Lethal allocation adds 1000 per declared DON!! and explains its greedy breakpoints.</td></tr>
+          <tr><td>Counter timing</td><td>7-1-3 allows the attacked player to trash a Character with Counter or pay and trash a [Counter] Event in the Counter Step.</td><td>Counter tools use only the values and playable events you declare.</td></tr>
+          <tr><td>Ties in battle</td><td>7-1-4-1 says the attack wins when attacking power is greater than or equal to defending power.</td><td>A tie needs another 1000 counter to be safe; the formula rounds up to that next 1000 step.</td></tr>
+          <tr><td>Damage at 0 Life</td><td>7-1-4-1-1-1 says the attacking player wins if the opponent has 0 Life when damage is dealt.</td><td>Only a final hit into entered 0 Life can receive the “game-ending” label.</td></tr>
+        </tbody>
+      </table>
+      <p><strong>Important correction to common shorthand:</strong> the rules do not set every Leader to 5000 power or 5 Life, and they do not prescribe universal 1000/2000 Counter values. Those are common input defaults and typical printed values, not fixed core-rule constants. Use your actual Leader and card text.</p>
+    </div>
+  </section>
+
+  <section id="lethal" class="content-section tint">
+    <div class="shell">
+      <span class="eyebrow" style="color: var(--red)"><FlaskConical size={15} /> Lethal Calculator</span>
+      <h2>Declared-pool greedy sequencing</h2>
+      <p>The Lethal Calculator is a readable board-state heuristic. It takes active attackers, applies the known modifier you type, and assigns active DON!! in a fixed order: it first raises attacks through 5000, then 7000, then successive 1000-power points. Within a breakpoint, higher-power attackers have priority. It then sequences final attack powers from strongest to weakest.</p>
+      <p>For each threatening attack, the tool asks whether the declared counter pool can get the current defender strictly above it. It spends the fewest declared cards that achieve that total, preserving the rest for later attacks. It marks the first unanswered hit and treats entered multi-damage as repeated Life damage for that hit.</p>
+      <p>This is not an exhaustive solver. It does not optimize card-specific ordering, model Blockers, account for cards entering hand from Life, know Trigger outcomes, or infer active DON!! for an opponent's event. A “line breaks the declared pool” result is conditional; a “game-ending line” result also requires 0 entered Life.</p>
+      <p><a href="/lethal-calculator/">Use the Lethal Calculator →</a></p>
+    </div>
+  </section>
+
+  <section id="draw" class="content-section">
+    <div class="shell">
+      <span class="eyebrow" style="color: var(--red)"><FlaskConical size={15} /> Draw Probability</span>
+      <h2>Hypergeometric distribution</h2>
+      <p>For a deck with <em>N</em> cards, <em>K</em> target cards, <em>n</em> cards seen, and exactly <em>k</em> target hits, the site uses:</p>
+      <p class="formula">P(X = k) = C(K, k)C(N − K, n − k) / C(N, n)</p>
+      <p>“At least” results sum all valid hit counts at or above the requested number. The opening redraw probability is 1 − P(miss opening hand)² when one target hit is requested. This is exact for a full redraw after a miss; it is not a recommendation to take that redraw.</p>
+      <p>Searcher modifiers are intentionally labelled as a simplified extra-look model. Trait restrictions, finding versus revealing, bottom-decking, and deck thinning have card-specific effects that this math-only site will not silently invent.</p>
+      <p><a href="/draw-probability/">Use the Draw Probability Calculator →</a></p>
+    </div>
+  </section>
+
+  <section id="counter" class="content-section tint">
+    <div class="shell">
+      <span class="eyebrow" style="color: var(--red)"><FlaskConical size={15} /> Counter Battle</span>
+      <h2>Exact counter combinations and unknown hands</h2>
+      <p>The immediate target is the smallest power increase that makes the defender strictly greater than the attacker. The displayed 1000-step amount is:</p>
+      <p class="formula">ceil((attack power − defense power + 1) / 1000) × 1000</p>
+      <p>For known cards, the site enumerates the 1000, 2000, and event values you enter and returns a minimum-card combination. For the optional bluff model, it sums every valid mix in an unknown hand using a multivariate hypergeometric distribution. That keeps 1000s, 2000s, and declared Counter-event values distinct instead of treating all “counter cards” as interchangeable.</p>
+      <p>The model cannot establish what an opponent actually holds. It does not include hand knowledge, filtering, Life adds, events without payable costs, Blockers, or decisions made earlier in the turn.</p>
+      <p><a href="/counter-battle/">Use the Counter Battle Calculator →</a></p>
+    </div>
+  </section>
+
+  <section class="content-section">
+    <div class="shell">
+      <span class="eyebrow" style="color: var(--red)"><ShieldCheck size={15} /> Quality checks</span>
+      <h2>What is tested</h2>
+      <p>Calculator code includes repeatable fixtures for hypergeometric probability, opening redraw improvement, tie-power counter requirements, an exact known-pool combination, a basic lethal sequence, and a one-card unknown-hand counter case. The 4-of in 50, draw 5 fixture resolves to 35.3% - the value from the formula above.</p>
+      <p>This site is maintained as a static tool suite. When the official rules change materially, the next update should revise the snapshot date, source link, methodology, and affected tests together.</p>
+    </div>
+  </section>
+</BaseLayout>

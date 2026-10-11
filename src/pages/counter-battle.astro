@@ -1,0 +1,118 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Eye, Info, RotateCcw, ShieldCheck, Swords } from '@lucide/astro';
+
+const schemas = [
+  {
+    '@context': 'https://schema.org', '@type': 'WebApplication', name: 'OPTCG Counter Battle Calculator',
+    url: 'https://optctools.top/counter-battle/', applicationCategory: 'GameApplication', operatingSystem: 'Any',
+    description: 'Calculate the minimum counter package needed to survive a ONE PIECE Card Game attack and estimate unknown-hand counter odds.',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  },
+  { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://optctools.top/' },
+    { '@type': 'ListItem', position: 2, name: 'Counter Battle Calculator', item: 'https://optctools.top/counter-battle/' },
+  ] },
+];
+---
+
+<BaseLayout title="ONE PIECE TCG Counter Calculator | OPTCGTools" description="Find the minimum counter cards needed to survive a ONE PIECE Card Game battle and model unknown-hand counter odds." schemas={schemas}>
+  <section class="page-intro">
+    <div class="shell">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><span>Counter Battle</span></nav>
+      <h1>ONE PIECE TCG <span style="color: var(--gold)">Counter Battle</span></h1>
+      <p>See the exact counter gap, the fewest declared cards that can cover it, and the odds an unknown hand contains enough live counter value.</p>
+    </div>
+  </section>
+
+  <div class="shell tool-layout">
+    <section class="calculator-panel" aria-labelledby="counter-tool-title">
+      <p class="tool-kicker"><ShieldCheck size={15} /> attack power → counter gap → odds</p>
+      <h2 id="counter-tool-title">Can they get above it?</h2>
+      <p class="tool-description">Attack ties win. To avoid damage or a K.O., the defender needs strictly more power - not equal power.</p>
+      <form id="counter-form">
+        <div class="divider-label">This battle</div>
+        <div class="form-grid">
+          <div class="field"><label for="attacker-power">Attacking power</label><div class="input-unit"><input id="attacker-power" type="number" min="0" step="1000" value="7000" /><span>power</span></div><small>Include DON!! and all known effects.</small></div>
+          <div class="field"><label for="defender-power">Defending power</label><div class="input-unit"><input id="defender-power" type="number" min="0" step="1000" value="5000" /><span>power</span></div><small>Current leader/character power.</small></div>
+        </div>
+        <div class="divider-label">Known cards in the defender's hand</div>
+        <div class="form-grid three">
+          <div class="field"><label for="known-1k">1000 counters</label><div class="input-unit"><input id="known-1k" type="number" min="0" max="30" value="2" /><span>cards</span></div></div>
+          <div class="field"><label for="known-2k">2000 counters</label><div class="input-unit"><input id="known-2k" type="number" min="0" max="30" value="1" /><span>cards</span></div></div>
+          <div class="field"><label for="known-event-count">Counter events</label><div class="input-unit"><input id="known-event-count" type="number" min="0" max="20" value="0" /><span>cards</span></div></div>
+          <div class="field"><label for="known-event-power">Event counter value</label><div class="input-unit"><input id="known-event-power" type="number" min="0" step="1000" value="3000" /><span>power</span></div><small>Only include events with cost available.</small></div>
+        </div>
+        <div class="divider-label">Unknown-hand bluff model</div>
+        <p style="margin: -5px 0 15px; color: var(--muted); font-size: 12px">Optional. Model an unseen source pile before the opponent drew their unknown hand. Include only cards that can counter this battle.</p>
+        <div class="form-grid three">
+          <div class="field"><label for="unknown-deck">Source pile size</label><div class="input-unit"><input id="unknown-deck" type="number" min="1" max="200" value="45" /><span>cards</span></div><small>Cards before the unknown hand was drawn.</small></div>
+          <div class="field"><label for="unknown-hand">Unknown hand size</label><div class="input-unit"><input id="unknown-hand" type="number" min="0" max="50" value="5" /><span>cards</span></div><small>Cards sampled from source pile.</small></div>
+          <div class="field"><label for="unknown-1k">Live 1000s</label><div class="input-unit"><input id="unknown-1k" type="number" min="0" max="200" value="12" /><span>cards</span></div></div>
+          <div class="field"><label for="unknown-2k">Live 2000s</label><div class="input-unit"><input id="unknown-2k" type="number" min="0" max="200" value="8" /><span>cards</span></div></div>
+          <div class="field"><label for="unknown-event-count">Live events</label><div class="input-unit"><input id="unknown-event-count" type="number" min="0" max="200" value="0" /><span>cards</span></div></div>
+          <div class="field"><label for="unknown-event-power">Event counter value</label><div class="input-unit"><input id="unknown-event-power" type="number" min="0" step="1000" value="3000" /><span>power</span></div></div>
+        </div>
+        <div class="form-actions"><button class="button" type="submit"><ShieldCheck size={16} /> Calculate counter line</button><button id="counter-reset" class="button secondary" type="reset"><RotateCcw size={15} /> Reset</button></div>
+      </form>
+      <div id="counter-result" class="result" aria-live="polite"></div>
+      <p class="callout"><Info size={17} /> This uses only counter values you provide. A Counter event needs its cost paid, [Blocker] happens earlier in battle, and card text can alter the standard sequence.</p>
+    </section>
+    <aside class="tool-sidebar">
+      <section class="side-card"><h2>Fast table rule</h2><p>At a tie, the attack wins. A 7000 attack into 5000 needs at least 3000 counter: 5000 + 3000 = 8000.</p></section>
+      <section class="side-card"><h2>Bluff probability</h2><p>The optional model exactly sums the possible 1000/2000/event mixes in an unknown hand. It does not read tells or account for cards gained from Life.</p></section>
+      <section class="side-card"><h2>Next calculation</h2><a href="/lethal-calculator/">Put it into a lethal line →</a><br /><a href="/rules-and-method/#counter">Read method & limits →</a></section>
+    </aside>
+  </div>
+
+  <section class="content-section tint">
+    <div class="shell">
+      <span class="eyebrow" style="color: var(--red)"><Eye size={15} /> Counter without guessing</span>
+      <h2>How much counter do I need?</h2>
+      <p>Subtract the defender's current power from the attacker's current power, then add 1. Because normal counter values come in 1000-power steps, round the result up to the next 1000. If the attacker is already below the defender, no counter is needed: the attack loses the battle.</p>
+      <p class="formula">counter required = ceil((attacker power − defender power + 1) / 1000) × 1000</p>
+      <p>For known cards, the calculator searches every valid mix of the 1000 counters, 2000 counters, and event value you declare. It reports the fewest cards that get the defender above - not merely equal to - the attacker. This matters when deciding whether a hand can actually answer multiple attacks.</p>
+      <h3>What the bluff model means</h3>
+      <p>The optional probability is an exact multivariate hypergeometric calculation over the counter categories you enter. For example, it can distinguish a hand with one 2000 counter from a hand with two 1000 counters. The result answers a narrow question: “If an unknown hand was drawn from this stated composition, what is the chance it has enough value for this one battle?”</p>
+      <p>It does not know which cards your opponent kept, whether an event is payable, blockers, Life triggers, previous counters spent, or player behaviour. Treat it as deck-composition math, not a read on the person across from you.</p>
+      <div class="faq-list">
+        <details><summary>Can they counter a 5000 attack with a 5000 leader?</summary><p>Yes, if they can add at least 1000. The attacker wins a tie, so the defender must reach 6000 to make the attack lose.</p></details>
+        <details><summary>Are 2000 counters always better?</summary><p>They often preserve hand count for a single power gap, but the best use depends on the rest of the attack sequence. The Lethal Calculator lets you test a declared mixed pool across multiple attacks.</p></details>
+        <details><summary>Does an Event count as a counter card?</summary><p>Only if it has [Counter], is in hand, and its activation cost can be paid. This tool asks you to make that availability assumption explicitly.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import { canCounter, counterHandProbability, formatPercent } from '../lib/calculators.js';
+    const form = document.querySelector('#counter-form');
+    const result = document.querySelector('#counter-result');
+    const value = (id) => Number(document.querySelector(id).value) || 0;
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const attack = value('#attacker-power');
+      const defense = value('#defender-power');
+      const knownPool = [
+        { name: '1000 counter', value: 1000, count: value('#known-1k') },
+        { name: '2000 counter', value: 2000, count: value('#known-2k') },
+        { name: 'Counter event', value: value('#known-event-power'), count: value('#known-event-count') },
+      ];
+      const known = canCounter(attack, defense, knownPool);
+      const unknownPool = [
+        { name: '1000 counter', value: 1000, count: value('#unknown-1k') },
+        { name: '2000 counter', value: 2000, count: value('#unknown-2k') },
+        { name: 'Counter event', value: value('#unknown-event-power'), count: value('#unknown-event-count') },
+      ];
+      const source = Math.max(1, value('#unknown-deck'));
+      const hand = Math.min(source, Math.max(0, value('#unknown-hand')));
+      const invalidComposition = unknownPool.reduce((sum, item) => sum + item.count, 0) > source;
+      const unknownChance = invalidComposition ? null : counterHandProbability(known.required, source, hand, unknownPool);
+      const title = known.required === 0 ? 'The attack already loses' : known.combination ? 'Known hand can counter' : 'Known hand cannot counter';
+      const knownText = known.required === 0 ? 'The defender is already above the attack.' : known.combination ? `${known.combination.used.join(' + ')} = ${known.combination.total.toLocaleString()} counter with ${known.combination.cards} card${known.combination.cards === 1 ? '' : 's'}.` : 'The entered hand cannot reach the required power.';
+      const unknownText = invalidComposition ? 'Unknown model needs correction: live counters exceed source-pile size.' : `Chance an unknown ${hand}-card hand reaches this target: ${formatPercent(unknownChance)}.`;
+      result.className = `result active ${known.combination || known.required === 0 ? '' : 'danger'}`;
+      result.innerHTML = `<h3>${title}</h3><p>${knownText}</p><div class="result-grid"><span class="result-stat"><strong>${known.required.toLocaleString()}</strong><span>counter required</span></span><span class="result-stat"><strong>${(defense + known.required).toLocaleString()}</strong><span>safe power target</span></span><span class="result-stat"><strong>${unknownChance === null ? '-' : formatPercent(unknownChance)}</strong><span>unknown-hand chance</span></span></div><p style="margin-top:14px">${unknownText}</p>`;
+    });
+    form.addEventListener('reset', () => window.setTimeout(() => { result.className = 'result'; result.innerHTML = ''; }, 0));
+  </script>
+</BaseLayout>

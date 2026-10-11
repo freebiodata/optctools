@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { ArrowRight, BookOpenCheck, Compass, Dices, Gauge, ShieldCheck, Swords, Waves } from '@lucide/astro';
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'OPTCGTools - ONE PIECE Card Game math tools',
+  description: 'Browser-based lethal, draw probability, and counter battle calculators for the ONE PIECE Card Game.',
+  url: 'https://optctools.top/',
+};
+---
+
+<BaseLayout
+  title="ONE PIECE TCG Math Tools | OPTCGTools"
+  description="Use focused ONE PIECE Card Game math tools for lethal lines, draw odds, and counter battles. No account or card database needed."
+  schemas={[schema]}
+>
+  <section class="hero">
+    <div class="shell hero-grid">
+      <div>
+        <span class="eyebrow"><Waves size={15} /> Grand Line game math</span>
+        <h1>Play the turn.<br /><em>Trust the numbers.</em></h1>
+        <p class="hero-lede">Fast, transparent math tools for ONE PIECE Card Game players who want cleaner attacks, better keeps, and fewer hopeful counters.</p>
+        <div class="hero-actions">
+          <a class="button gold" href="/lethal-calculator/">Find a lethal line <ArrowRight size={17} /></a>
+          <a class="button ghost" href="/draw-probability/">Check draw odds</a>
+        </div>
+        <p class="hero-note"><ShieldCheck size={15} /> Runs in your browser. No account. No decklist upload. No card database.</p>
+      </div>
+      <div class="hero-map" aria-hidden="true">
+        <span class="map-label one">Board state</span>
+        <span class="map-label two">Counter math</span>
+        <span class="map-label three">Draw odds</span>
+        <i class="route one"></i><i class="route two"></i>
+        <span class="compass-rose"><Compass size={35} /></span>
+      </div>
+    </div>
+  </section>
+
+  <section id="tools" class="section">
+    <div class="shell">
+      <div class="section-heading">
+        <span class="eyebrow" style="color: var(--red)"><Compass size={14} /> Choose your heading</span>
+        <h2>Three tools. One clearer turn.</h2>
+        <p>Each tool answers one job at the table. Set the facts you know, state your assumptions, and get the arithmetic without an opaque card database.</p>
+      </div>
+      <div class="tool-grid">
+        <a class="tool-card" href="/lethal-calculator/">
+          <span class="tool-icon"><Swords size={25} /></span>
+          <h3>Lethal Calculator</h3>
+          <p>Map active attackers, available DON!!, life, and the counters you expect. Get a practical pressure sequence and see where the declared pool breaks.</p>
+          <span class="card-badge">BOARD → DON!! → LINE</span>
+          <span class="card-link">Plot the attack <ArrowRight size={16} /></span>
+        </a>
+        <a class="tool-card" href="/draw-probability/">
+          <span class="tool-icon"><Dices size={25} /></span>
+          <h3>Draw Probability</h3>
+          <p>Use hypergeometric math to estimate when you will see your pieces, including extra looks from searchers and your one opening redraw.</p>
+          <span class="card-badge">DECK → LOOKS → ODDS</span>
+          <span class="card-link">Chart the odds <ArrowRight size={16} /></span>
+        </a>
+        <a class="tool-card" href="/counter-battle/">
+          <span class="tool-icon"><Gauge size={25} /></span>
+          <h3>Counter Battle</h3>
+          <p>Find the smallest counter package that survives an attack, then estimate the chance an unknown hand can actually have it.</p>
+          <span class="card-badge">POWER → GAP → ANSWER</span>
+          <span class="card-link">Test the counter <ArrowRight size={16} /></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tint">
+    <div class="shell split">
+      <div>
+        <div class="section-heading">
+          <span class="eyebrow" style="color: var(--red)"><BookOpenCheck size={15} /> The honest version</span>
+          <h2>Math only is a feature.</h2>
+          <p>OPTCGTools does not pretend to know every list, every trigger, or every line of card text. It gives you stable game math and makes the assumptions visible.</p>
+        </div>
+        <div class="feature-list">
+          <div class="feature"><span class="feature-icon"><ShieldCheck size={18} /></span><div><h3>Your state stays yours</h3><p>Inputs are calculated locally in the browser. There is no sign-in, telemetry, or saved game state.</p></div></div>
+          <div class="feature"><span class="feature-icon"><BookOpenCheck size={18} /></span><div><h3>Rules snapshot, not vibes</h3><p>Method notes link back to the official Comprehensive Rules and carry a versioned snapshot date.</p></div></div>
+          <div class="feature"><span class="feature-icon"><Compass size={18} /></span><div><h3>Assumptions up front</h3><p>Blockers, triggers, card-specific effects, and unknown Life cards are called out instead of silently guessed.</p></div></div>
+        </div>
+      </div>
+      <aside class="quote-card">
+        <span class="eyebrow">A better table question</span>
+        <p>Not “<strong>do I have it?</strong>”<br />but “<strong>what must they have?</strong>”</p>
+        <p style="font: 500 13px/1.6 Manrope, sans-serif; letter-spacing: 0; color: #c5d6ea;">Use a calculator to test the known state - then use play skill for everything information cannot prove.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="content-section">
+    <div class="shell">
+      <span class="eyebrow" style="color: var(--red)">Start here</span>
+      <h2>How OPTCGTools handles a game state</h2>
+      <p>The tools follow the current rules snapshot for the basic framework: 50-card decks, a 10-card DON!! deck, five-card opening hands with one redraw, +1000 power per given DON!! during your turn, and counters played in the Counter Step. Card text can override the general rules, so a calculator result is always a starting point - not a ruling for a card-specific interaction.</p>
+      <p><a href="/rules-and-method/">Read the rules snapshot and methodology</a> before relying on a narrow edge case.</p>
+      <div class="faq-list">
+        <details><summary>Does this have a card database?</summary><p>No. That is deliberate. These are fast, portable math tools for a board state you enter yourself; they do not need to scrape, store, or guess your deck.</p></details>
+        <details><summary>Can a calculator promise a lethal through unknown Life cards?</summary><p>No. The lethal tool reports what follows from the counter pool you declare. If the opponent has Life remaining, a successful hit adds a Life card to hand and may reveal a Trigger, so the site labels that distinction.</p></details>
+        <details><summary>Are you affiliated with the ONE PIECE Card Game?</summary><p>No. OPTCGTools is an independent fan-made math utility and is not affiliated with Bandai, Shueisha, or the ONE PIECE Card Game.</p></details>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

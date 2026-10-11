@@ -1,0 +1,169 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { AlertTriangle, ArrowRight, CirclePlus, Info, RotateCcw, Swords, Trash2 } from '@lucide/astro';
+
+const schemas = [
+  {
+    '@context': 'https://schema.org', '@type': 'WebApplication', name: 'OPTCG Lethal Calculator',
+    url: 'https://optctools.top/lethal-calculator/', applicationCategory: 'GameApplication', operatingSystem: 'Any',
+    description: 'A rules-based heuristic for sequencing declared ONE PIECE Card Game attackers and DON!! against a declared counter pool.',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  },
+  {
+    '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://optctools.top/' },
+      { '@type': 'ListItem', position: 2, name: 'Lethal Calculator', item: 'https://optctools.top/lethal-calculator/' },
+    ],
+  },
+];
+---
+
+<BaseLayout title="ONE PIECE TCG Lethal Calculator | OPTCGTools" description="Sequence ONE PIECE Card Game attacks, DON!! allocation, and declared counters to test a rules-based lethal line." schemas={schemas}>
+  <section class="page-intro">
+    <div class="shell">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><span>Lethal Calculator</span></nav>
+      <h1>ONE PIECE TCG <span style="color: var(--gold)">Lethal Calculator</span></h1>
+      <p>Set the board you can see. The calculator allocates your remaining DON!! through practical power breakpoints, tests the counter pool you declare, then lists the pressure line.</p>
+    </div>
+  </section>
+
+  <div class="shell tool-layout">
+    <section class="calculator-panel" aria-labelledby="lethal-tool-title">
+      <p class="tool-kicker"><Swords size={15} /> board → DON!! → forced counters</p>
+      <h2 id="lethal-tool-title">Test the declared state</h2>
+      <p class="tool-description">This is a transparent greedy heuristic. It does not know blockers, triggers, [On Attack] effects, or cards gained from Life.</p>
+
+      <form id="lethal-form">
+        <div class="divider-label">Your active attackers</div>
+        <div id="attacker-rows" class="attacker-rows">
+          <div class="attacker-row">
+            <div class="field"><label for="attacker-name-1">Name</label><input id="attacker-name-1" data-key="name" value="Leader" maxlength="28" /></div>
+            <div class="field"><label for="attacker-power-1">Base power</label><input id="attacker-power-1" data-key="power" type="number" min="0" step="1000" value="5000" /></div>
+            <div class="field"><label for="attacker-mod-1">Effect ± power</label><input id="attacker-mod-1" data-key="modifier" type="number" step="1000" value="0" /></div>
+            <div class="field"><label for="attacker-damage-1">Damage</label><input id="attacker-damage-1" data-key="damage" type="number" min="1" max="9" value="1" /></div>
+            <button class="icon-button remove-attacker" type="button" aria-label="Remove Leader"><Trash2 size={15} /></button>
+          </div>
+          <div class="attacker-row">
+            <div class="field"><label for="attacker-name-2">Name</label><input id="attacker-name-2" data-key="name" value="Character A" maxlength="28" /></div>
+            <div class="field"><label for="attacker-power-2">Base power</label><input id="attacker-power-2" data-key="power" type="number" min="0" step="1000" value="5000" /></div>
+            <div class="field"><label for="attacker-mod-2">Effect ± power</label><input id="attacker-mod-2" data-key="modifier" type="number" step="1000" value="0" /></div>
+            <div class="field"><label for="attacker-damage-2">Damage</label><input id="attacker-damage-2" data-key="damage" type="number" min="1" max="9" value="1" /></div>
+            <button class="icon-button remove-attacker" type="button" aria-label="Remove Character A"><Trash2 size={15} /></button>
+          </div>
+          <div class="attacker-row">
+            <div class="field"><label for="attacker-name-3">Name</label><input id="attacker-name-3" data-key="name" value="Character B" maxlength="28" /></div>
+            <div class="field"><label for="attacker-power-3">Base power</label><input id="attacker-power-3" data-key="power" type="number" min="0" step="1000" value="4000" /></div>
+            <div class="field"><label for="attacker-mod-3">Effect ± power</label><input id="attacker-mod-3" data-key="modifier" type="number" step="1000" value="0" /></div>
+            <div class="field"><label for="attacker-damage-3">Damage</label><input id="attacker-damage-3" data-key="damage" type="number" min="1" max="9" value="1" /></div>
+            <button class="icon-button remove-attacker" type="button" aria-label="Remove Character B"><Trash2 size={15} /></button>
+          </div>
+        </div>
+        <div class="form-actions" style="margin-top: 12px"><button id="add-attacker" class="button secondary" type="button"><CirclePlus size={16} /> Add attacker</button></div>
+
+        <div class="divider-label">Opponent & available DON!!</div>
+        <div class="form-grid three">
+          <div class="field"><label for="available-don">DON!! to attach</label><div class="input-unit"><input id="available-don" type="number" min="0" max="10" value="3" /><span>DON!!</span></div><small>Active DON!! you can give this turn.</small></div>
+          <div class="field"><label for="leader-power">Leader power</label><div class="input-unit"><input id="leader-power" type="number" min="0" step="1000" value="5000" /><span>power</span></div><small>Current power after known effects.</small></div>
+          <div class="field"><label for="life-count">Life remaining</label><div class="input-unit"><input id="life-count" type="number" min="0" max="9" value="0" /><span>Life</span></div><small>Use 0 for a true game-ending test.</small></div>
+        </div>
+
+        <div class="divider-label">Declared counter pool</div>
+        <div class="form-grid three">
+          <div class="field"><label for="counter-1k">1000 counters</label><div class="input-unit"><input id="counter-1k" type="number" min="0" max="30" value="2" /><span>cards</span></div></div>
+          <div class="field"><label for="counter-2k">2000 counters</label><div class="input-unit"><input id="counter-2k" type="number" min="0" max="30" value="1" /><span>cards</span></div></div>
+          <div class="field"><label for="counter-event-count">Counter events</label><div class="input-unit"><input id="counter-event-count" type="number" min="0" max="20" value="0" /><span>cards</span></div></div>
+          <div class="field"><label for="counter-event-power">Event counter value</label><div class="input-unit"><input id="counter-event-power" type="number" min="0" step="1000" value="3000" /><span>power</span></div><small>Only include playable events whose cost is available.</small></div>
+        </div>
+        <div class="form-actions">
+          <button class="button" type="submit"><Swords size={16} /> Plot pressure line</button>
+          <button id="lethal-reset" class="button secondary" type="reset"><RotateCcw size={15} /> Reset</button>
+        </div>
+      </form>
+
+      <div id="lethal-result" class="result" aria-live="polite"></div>
+      <p class="callout"><Info size={17} /> A line is only as certain as its inputs. Life cards can add new counters to hand; triggers, blockers, effects, and card text may change the line. Card text takes precedence over the comprehensive rules.</p>
+    </section>
+
+    <aside class="tool-sidebar">
+      <section class="side-card"><h2>What “unconditional” means here</h2><p>A green game-ending result is only shown when the opponent is at 0 Life and their <em>declared</em> counters cannot stop the final attack. It is not a claim about hidden blockers or effects.</p></section>
+      <section class="side-card"><h2>Greedy DON!! heuristic</h2><p>Attackers are sorted by power. DON!! first moves attacks through 5000, then 7000, then the next 1000-power breakpoints. Stronger attacks lead the pressure sequence.</p></section>
+      <section class="side-card"><h2>Next calculation</h2><a href="/counter-battle/">Check one battle exactly →</a><br /><a href="/rules-and-method/#lethal">Read method & limits →</a></section>
+    </aside>
+  </div>
+
+  <section class="content-section tint">
+    <div class="shell">
+      <span class="eyebrow" style="color: var(--red)">Use it responsibly</span>
+      <h2>How this ONE PIECE TCG lethal calculator works</h2>
+      <p>For each active attacker you enter base power, a known modifier, and any multi-damage you know applies. The calculator gives available DON!! one at a time, adding 1000 power per DON!! during your turn, and then tests the opponent's declared counter values against each attack. An attacker wins a battle at equal power, so the defender needs to get strictly above it.</p>
+      <h3>What it can tell you</h3>
+      <ul><li>Which declared attacks are below the opponent's current leader power.</li><li>How much counter each threatening attack forces under the pool you entered.</li><li>Where the declared counter pool becomes unable to stop a hit.</li><li>Whether a final hit ends a 0-Life game under those stated assumptions.</li></ul>
+      <h3>What it intentionally does not pretend to know</h3>
+      <p>There is no database here. Entering every card-specific interaction would make a generic tool look precise when it cannot be. The calculator does not simulate Blockers, On Attack effects, alternative win conditions, Trigger choices, removal, or counters gained when Life is taken. Use it for the arithmetic, then check your cards and a judge for the interaction.</p>
+      <div class="faq-list">
+        <details><summary>Why can a 5000 attack force 1000 counter into a 5000 leader?</summary><p>During the Damage Step, the attacking card wins when its power is greater than or equal to the defender's power. To survive, the defender must counter to 6000 - not merely tie at 5000.</p></details>
+        <details><summary>Why is Life remaining a warning?</summary><p>When a Leader with one or more Life takes damage, the top Life card is added to hand, and a Trigger may be used instead. That newly gained card can change later counter math, so only a 0-Life final attack can be labeled game-ending by this tool.</p></details>
+        <details><summary>Does “counter event” include its cost?</summary><p>No. Enter only Counter events you believe are playable with the opponent's active DON!!. The official rules require an Event's cost to be paid to activate its [Counter] effect.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import { calculateLethal } from '../lib/calculators.js';
+
+    const form = document.querySelector('#lethal-form');
+    const rows = document.querySelector('#attacker-rows');
+    const result = document.querySelector('#lethal-result');
+    const number = (selector) => Number(document.querySelector(selector).value) || 0;
+    const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[character]);
+    let nextAttacker = 4;
+
+    function attachRemove(button) {
+      button.addEventListener('click', () => {
+        if (rows.children.length > 1) button.closest('.attacker-row').remove();
+      });
+    }
+    document.querySelectorAll('.remove-attacker').forEach(attachRemove);
+    document.querySelector('#add-attacker').addEventListener('click', () => {
+      const row = document.createElement('div');
+      row.className = 'attacker-row';
+      row.innerHTML = `<div class="field"><label>Name</label><input data-key="name" value="Character ${nextAttacker - 1}" maxlength="28"></div><div class="field"><label>Base power</label><input data-key="power" type="number" min="0" step="1000" value="5000"></div><div class="field"><label>Effect ± power</label><input data-key="modifier" type="number" step="1000" value="0"></div><div class="field"><label>Damage</label><input data-key="damage" type="number" min="1" max="9" value="1"></div><button class="icon-button remove-attacker" type="button" aria-label="Remove attacker">×</button>`;
+      rows.append(row);
+      attachRemove(row.querySelector('.remove-attacker'));
+      nextAttacker += 1;
+    });
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const attackers = [...rows.querySelectorAll('.attacker-row')].map((row, index) => ({
+        name: row.querySelector('[data-key="name"]').value.trim() || `Attacker ${index + 1}`,
+        power: Number(row.querySelector('[data-key="power"]').value) || 0,
+        modifier: Number(row.querySelector('[data-key="modifier"]').value) || 0,
+        damage: Math.max(1, Number(row.querySelector('[data-key="damage"]').value) || 1),
+      }));
+      const game = calculateLethal({
+        attackers, availableDon: number('#available-don'), leaderPower: number('#leader-power'), life: number('#life-count'),
+        counterPool: [
+          { name: '1000 counter', value: 1000, count: number('#counter-1k') },
+          { name: '2000 counter', value: 2000, count: number('#counter-2k') },
+          { name: 'Counter event', value: number('#counter-event-power'), count: number('#counter-event-count') },
+        ],
+      });
+      const title = game.unconditional ? 'Unconditional game-ending line found' : game.lethal ? 'A line breaks the declared pool' : 'No lethal under this counter model';
+      const summary = game.unconditional
+        ? 'Opponent is at 0 Life and the final declared attack cannot be countered by the pool you entered.'
+        : game.lethal
+          ? 'The model reaches a hit after the declared pool is exhausted, but Life cards, triggers, and other hidden information can change later attacks.'
+          : 'Every threatening attack can be answered by the declared counter pool, or no attack reaches the current leader power.';
+      const rowsHtml = game.steps.map((step, index) => {
+        const detail = step.status === 'countered' ? `Needs ${step.required.toLocaleString()} counter · ${step.counter.used.join(' + ')}` : step.status === 'below' ? 'Below current leader power' : step.status === 'lethal' ? 'No declared counter remains' : `Hit for ${step.damage || 1} damage`;
+        const status = step.status === 'countered' ? 'stop' : step.status === 'below' ? 'low' : step.status === 'lethal' ? 'lethal' : 'hit';
+        return `<div class="sequence-step"><span class="sequence-num">${index + 1}</span><span><strong>${escapeHtml(step.label)} · ${step.power.toLocaleString()}${step.don ? ` (+${step.don} DON!!)` : ''}</strong><small>${detail}</small></span><span class="tag ${status}">${step.status}</span></div>`;
+      }).join('');
+      const usedDon = game.allocated.reduce((total, attacker) => total + attacker.don, 0);
+      result.className = `result active ${game.lethal ? '' : 'danger'}`;
+      result.innerHTML = `<h3>${title}</h3><p>${summary}</p><div class="result-grid"><span class="result-stat"><strong>${usedDon}</strong><span>DON!! assigned</span></span><span class="result-stat"><strong>${game.steps.filter((step) => step.status === 'countered').length}</strong><span>attacks answered</span></span><span class="result-stat"><strong>${game.remainingLife}</strong><span>model Life left</span></span></div><div class="sequence">${rowsHtml}</div>`;
+    });
+    form.addEventListener('reset', () => window.setTimeout(() => { result.className = 'result'; result.innerHTML = ''; }, 0));
+  </script>
+</BaseLayout>

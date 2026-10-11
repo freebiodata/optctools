@@ -1,0 +1,104 @@
+---
+import '../styles/global.css';
+import { Anchor, ArrowUpRight, Compass } from '@lucide/astro';
+
+interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  schemas?: Record<string, unknown>[];
+}
+
+const { title, description, canonical, schemas = [] } = Astro.props;
+const url = new URL(canonical || Astro.url.pathname, Astro.site);
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'OPTCGTools',
+  url: 'https://optctools.top',
+  description: 'Browser-based math tools for the ONE PIECE Card Game.',
+};
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'OPTCGTools',
+  url: 'https://optctools.top',
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0e2547" />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={url} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="OPTCGTools" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={url} />
+    <meta name="twitter:card" content="summary" />
+    <title>{title}</title>
+    <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+    {schemas.map((schema) => <script type="application/ld+json" set:html={JSON.stringify(schema)} />)}
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to calculator</a>
+    <header class="site-header">
+      <div class="shell nav-wrap">
+        <a class="brand" href="/" aria-label="OPTCGTools home">
+          <span class="brand-mark"><Anchor size={19} strokeWidth={2.5} /></span>
+          <span>OPTCG<span>Tools</span></span>
+        </a>
+        <nav class="primary-nav" aria-label="Primary navigation">
+          <a href="/lethal-calculator/">Lethal</a>
+          <a href="/draw-probability/">Draw odds</a>
+          <a href="/counter-battle/">Counters</a>
+          <a href="/rules-and-method/">Rules & method</a>
+        </nav>
+        <a class="nav-cta" href="/#tools">Pick a tool <Compass size={15} /></a>
+      </div>
+    </header>
+    <main id="main-content">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="shell footer-grid">
+        <section>
+          <a class="brand footer-brand" href="/">
+            <span class="brand-mark"><Anchor size={18} strokeWidth={2.5} /></span>
+            <span>OPTCG<span>Tools</span></span>
+          </a>
+          <p>Clean game math for clearer turns. No card database, account, or tracking required.</p>
+        </section>
+        <section>
+          <h2>Tools</h2>
+          <a href="/lethal-calculator/">Lethal Calculator</a>
+          <a href="/draw-probability/">Draw Probability</a>
+          <a href="/counter-battle/">Counter Battle</a>
+        </section>
+        <section>
+          <h2>Trust & rules</h2>
+          <a href="/rules-and-method/">Rules snapshot & method</a>
+          <a href="/about/">About this project</a>
+          <a href="/privacy/">Privacy</a>
+        </section>
+        <section>
+          <h2>Official source</h2>
+          <a href="https://en.onepiece-cardgame.com/pdf/rule_comprehensive.pdf?20240426=" target="_blank" rel="noreferrer">
+            Comprehensive Rules <ArrowUpRight size={14} />
+          </a>
+          <p class="footer-update">Rules snapshot: v1.2.1<br />Last verified: October 12, 2026</p>
+        </section>
+      </div>
+      <div class="shell legal-line">
+        <span>© 2026 OPTCGTools. Math-only, browser-based tools.</span>
+        <span>Not affiliated with Bandai, Shueisha, or the ONE PIECE Card Game.</span>
+      </div>
+    </footer>
+  </body>
+</html>
